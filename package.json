@@ -1,0 +1,12 @@
+{
+  "name": "@types/scap-api",
+  "version": "0.0.1",
+  "description": "Type definitions for LG Scap API",
+  "main": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MSDevs/types-scap-api"
+  },
+  "author": "Michael Shakarov",
+  "license": "SEE LICENSE IN LICENSE"
+}
