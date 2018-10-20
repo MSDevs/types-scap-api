@@ -4,7 +4,7 @@
 interface FilesList { filesList: Object; filesCount: number; }
 
 interface ExternalMemory {
-    [deviceURI: string] : GetStorageInfoResult;
+    [deviceURI: string]: GetStorageInfoResult;
 }
 
 interface GetStorageInfoResult {
@@ -12,6 +12,36 @@ interface GetStorageInfoResult {
     total: number; //Total space (KB) of the local storage.
     used: number;//Used space (KB) in the local storage.
     externalMemory?: ExternalMemory;
+}
+
+interface StatFileResult {
+    type: "file" | "directory" | "unknown";
+    size: number; //byte
+    /**
+     * 	The last time the file was accessed.
+     *
+     * @type {string}
+     * @memberof StatFileResult
+     */
+    atime: string;
+
+    /**
+     * The last time when the file content was modified (File modification time).
+     * Actions such as owner change or permission change does not trigger a change for this property.
+     * Thus this property is used for tracking the actual changes in the file content.
+     *
+     * @type {string}
+     * @memberof StatFileResult
+     */
+    mtime: string;
+
+    /**
+     * 	The last time when a file attribute (e.g. ownership, permission) was modified (File change time).
+     *
+     * @type {string}
+     * @memberof StatFileResult
+     */
+    ctime: string;
 }
 
 interface CopyFileOptions {
@@ -31,7 +61,7 @@ interface CopyFileOptions {
      * @memberof CopyFileOptions
      */
     destination: string;
-    
+
     ftpOption?: {
         secure?: 'implicit' | 'explicit';
         secureOptions?: {
@@ -57,56 +87,116 @@ interface CopyFileOptions {
     }
 }
 
-interface Storage {
-        changeLogoImage(successCallback : any ,failureCallback : any, options : Object) : void;	
+interface PathOptions {
+    /**
+     * The URI of the file
+     *
+     * @type {string}
+     * @memberof PathOptions
+     */
+    path: string;
+}
 
-        /**
-         * Copies a file from the given source location to the given target location.
-         * Available source locations are; remote server, USB flash drive, SD card and local storage. Specify the file or directory as a URI
-         *
-         * @param {*} successCallback
-         * @param {*} failureCallback
-         * @param {Object} options
-         * @memberof Storage
-         */
-        copyFile(successCallback : any ,failureCallback : any, options : CopyFileOptions) : void;
-        downloadFirmware(successCallback : any ,failureCallback : any, options : Object) : void;
-        
-        
-        /**
-         * Checks if the given file or directory does exist in the local storage or an external storage.
-         * Give the pathname as a URI.
-         * 
-         * @param {*} successCallback
-         * @param {*} failureCallback
-         * @param {{ path: string }} options
-         * @memberof Storage
-         */
-        exists(successCallback : (result: { exists: boolean }) => void ,failureCallback : (error) => void, options : { path: string }) : void;
-        fsync(successCallback : any ,failureCallback : any, options : Object);
-        listFiles(successCallback : any ,failureCallback : any, options : Object) : FilesList;
-        
-        /**
-         * Creates a directory. The directory pathname shall be given as a URI.
-         * If the given pathname does not exist, sub-directories will be created recursively.
-         * 
-         * @param {*} successCallback
-         * @param {*} failureCallback
-         * @param {{ path: string }} options
-         * @memberof Storage
-         */
-        mkdir(successCallback : () => void ,failureCallback : any, options : { path: string }) : void;
-        moveFile(successCallback : any ,failureCallback : any, options : Object) : void;
-        readFile(successCallback : any ,failureCallback : any, options : Object) : string;
-        removeFile(successCallback : any ,failureCallback : any, options : Object) : void;
-        removeAll(successCallback : any ,failureCallback : any, options : Object) : void;
-        upgradeApplication(successCallback : any ,failureCallback : any, options : Object) : void;
-        getStorageInfo(successCallback : (result: GetStorageInfoResult) => void ,failureCallback : any) : void;
-        statFile(successCallback : any ,failureCallback : any, options : Object) : void; // Gets status information of a file.
-        writeFile(successCallback : any, failureCallback : any, options : Object) : void;
+interface WriteFileOptions {
+    path: string;
+    data: string | ArrayBuffer;
+    mode?: "truncate" | "append" | "position";
+    position?: number;
+    length?: number;
+    encoding?: Encoding;
+}
+
+declare type Encoding = "utf8" | // Encode as UTF-8. The data to write shall be a string. (Default)
+    "base64" | //Encode as base64. The data to write shall be a string.
+    "binary"; //Encode as raw binary. The data to write shall be an ArrayBuffer.
+
+interface ReadFileOptions {
+    path: string;
+    position?: number;
+    length?: number;
+    encoding?: Encoding;
+}
+
+interface ReadFileResult {
+    data: string | ArrayBuffer;
+}
+
+interface Storage {
+    changeLogoImage(successCallback: any, failureCallback: any, options: Object): void;
+
+    /**
+     * Copies a file from the given source location to the given target location.
+     * Available source locations are; remote server, USB flash drive, SD card and local storage. Specify the file or directory as a URI
+     *
+     * @param {*} successCallback
+     * @param {*} failureCallback
+     * @param {Object} options
+     * @memberof Storage
+     */
+    copyFile(successCallback: any, failureCallback: any, options: CopyFileOptions): void;
+    downloadFirmware(successCallback: any, failureCallback: any, options: Object): void;
+
+
+    /**
+     * Checks if the given file or directory does exist in the local storage or an external storage.
+     * Give the pathname as a URI.
+     * 
+     * @param {*} successCallback
+     * @param {*} failureCallback
+     * @param {{ path: string }} options
+     * @memberof Storage
+     */
+    exists(successCallback: (result: { exists: boolean }) => void, failureCallback: (error) => void, options: PathOptions): void;
+    fsync(successCallback: any, failureCallback: any, options: Object);
+    listFiles(successCallback: any, failureCallback: any, options: Object): FilesList;
+
+    /**
+     * Creates a directory. The directory pathname shall be given as a URI.
+     * If the given pathname does not exist, sub-directories will be created recursively.
+     * 
+     * @param {*} successCallback
+     * @param {*} failureCallback
+     * @param {{ path: string }} options
+     * @memberof Storage
+     */
+    mkdir(successCallback: () => void, failureCallback: any, options: PathOptions): void;
+    moveFile(successCallback: any, failureCallback: any, options: Object): void;
+    
+    /**
+     * Reads the given file from the local storage or an external storage. The pathname shall be given in a URI
+     *
+     * @param {(result : ReadFileResult) => void} successCallback
+     * @param {*} failureCallback
+     * @param {ReadFileOptions} options
+     * @returns {string}
+     * @memberof Storage
+     */
+    readFile(successCallback: (result : ReadFileResult) => void, failureCallback: any, options: ReadFileOptions): string;
+    removeFile(successCallback: any, failureCallback: any, options: Object): void;
+    removeAll(successCallback: any, failureCallback: any, options: Object): void;
+    upgradeApplication(successCallback: any, failureCallback: any, options: Object): void;
+    getStorageInfo(successCallback: (result: GetStorageInfoResult) => void, failureCallback: any): void;
+
+    /**
+     * Gets status information of a file.
+     *
+     * @param {(result: StatFileResult) => void} successCallback
+     * @param {*} failureCallback
+     * @param {PathOptions} options
+     * @memberof Storage
+     */
+    statFile(successCallback: (result: StatFileResult) => void, failureCallback: any, options: PathOptions): void;
+
+
+    writeFile(successCallback: any, failureCallback: any, options: Object): void;
 }
 
 declare var Storage: {
-    new()       :   Storage;
-    prototype   :   Storage;
+    new(): Storage;
+    prototype: Storage;
+}
+
+interface WebOSError {
+    errorCode: number;
+    errorText: string;
 }
