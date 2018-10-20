@@ -121,6 +121,35 @@ interface ReadFileResult {
     data: string | ArrayBuffer;
 }
 
+interface RemoveFileOptions {
+    file: string;
+    /**
+     * Delete the directory and any content inside the directory.
+     * Default is false
+     *
+     * @type {boolean}
+     * @memberof RemoveFileOptions
+     */
+    recursive?: boolean;
+}
+
+interface WebosFile {
+    name?: string;
+    type?: string;
+    size?: number;
+}
+
+interface ListFilesResult {
+    files: WebosFile;
+    /**
+     * Number of the files in the given location.
+     *
+     * @type {number}
+     * @memberof ListFilesResult
+     */
+    totalCount: number;
+}
+
 interface Storage {
     changeLogoImage(successCallback: any, failureCallback: any, options: Object): void;
 
@@ -148,7 +177,8 @@ interface Storage {
      */
     exists(successCallback: (result: { exists: boolean }) => void, failureCallback: (error) => void, options: PathOptions): void;
     fsync(successCallback: any, failureCallback: any, options: Object);
-    listFiles(successCallback: any, failureCallback: any, options: Object): FilesList;
+    //Lists the files in the given directory stored in the local storage or in an external storage. The directory pathname shall be given as a URI.s
+    listFiles(successCallback: any, failureCallback: any, options: { path?: string }): FilesList;
 
     /**
      * Creates a directory. The directory pathname shall be given as a URI.
@@ -161,7 +191,7 @@ interface Storage {
      */
     mkdir(successCallback: () => void, failureCallback: any, options: PathOptions): void;
     moveFile(successCallback: any, failureCallback: any, options: Object): void;
-    
+
     /**
      * Reads the given file from the local storage or an external storage. The pathname shall be given in a URI
      *
@@ -171,8 +201,17 @@ interface Storage {
      * @returns {string}
      * @memberof Storage
      */
-    readFile(successCallback: (result : ReadFileResult) => void, failureCallback: any, options: ReadFileOptions): string;
-    removeFile(successCallback: any, failureCallback: any, options: Object): void;
+    readFile(successCallback: (result: ReadFileResult) => void, failureCallback: any, options: ReadFileOptions): string;
+
+    /**
+     * Removes a file in the local storage or an external storage. Give the file pathname as a URI
+     *
+     * @param {() => void} successCallback
+     * @param {*} failureCallback
+     * @param {RemoveFileOptions} options
+     * @memberof Storage
+     */
+    removeFile(successCallback: () => void, failureCallback: any, options: RemoveFileOptions): void;
     removeAll(successCallback: any, failureCallback: any, options: Object): void;
     upgradeApplication(successCallback: any, failureCallback: any, options: Object): void;
     getStorageInfo(successCallback: (result: GetStorageInfoResult) => void, failureCallback: any): void;
