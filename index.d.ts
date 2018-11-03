@@ -239,3 +239,55 @@ interface WebOSError {
     errorCode: number;
     errorText: string;
 }
+
+interface ChangeInputSourceOptions {
+    src: string;
+}
+
+interface InitializeInputSourceOptions extends ChangeInputSourceOptions {
+    divId: string;
+    videoId: string;
+    callback: () => void;
+}
+
+interface GetInputSourceStatusResult {
+    inputSourceList: { "inputPort": string }[];
+    currentInputSource: "ext://hdmi:1" | "ext://hdmi:2" | "ext://dvi:1" | "ext://dp:1" | string;
+    currentSignalState: "good" | "bad" | "unknown";
+}
+
+interface  InputSource {
+
+    /**
+     * Changes the current input source displayed on the screen.
+     * @memberof InputSource
+     */
+    changeInputSource(successCallback: () => void, failureCallback: any, options: ChangeInputSourceOptions);
+
+
+    /**
+     * Returns a list of external input sources connected to a signage device
+     *
+     * @memberof InputSource
+     */
+    getExternalInputList();
+
+
+    /**
+     * Gets the current input source, its status, and a list of available input sources.
+     *
+     * @memberof InputSource
+     */
+    getInputSourceStatus(successCallback: (result: GetInputSourceStatusResult) => void, failureCallback: any);
+
+    /**
+     * Creates a video tag with the given ID inside the given div tag.
+     * @memberof InputSource
+     */
+    initialize(successCallback: () => void, failureCallback: any, options: InitializeInputSourceOptions);
+}
+
+declare var InputSource: {
+    new(): InputSource;
+    prototype: InputSource;
+}
