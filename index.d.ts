@@ -230,6 +230,17 @@ interface Storage {
     writeFile(successCallback: any, failureCallback: any, options: Object): void;
 }
 
+interface AppMode{
+	LOCAL 		:  string		//App runs on a local storage. 
+	REMOTE		:  string		//App runs on a remote server
+	USB			:  string		//App runs on a USB storage. 
+}
+
+interface AppType {
+    ZIP: string;
+    IPK: string;
+}
+
 declare var Storage: {
     new(): Storage;
     prototype: Storage;
@@ -247,6 +258,7 @@ interface ChangeInputSourceOptions {
 interface InitializeInputSourceOptions extends ChangeInputSourceOptions {
     divId: string;
     videoId: string;
+    noaudio: boolean;
     callback: () => void;
 }
 
